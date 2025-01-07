@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: greeting-service
+greeting-service:
+  greeting: "Ola"
+  default-value: "World"
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - '*'
