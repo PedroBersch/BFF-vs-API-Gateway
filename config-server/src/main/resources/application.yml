@@ -1,0 +1,13 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: bersch-config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/PedroBersch/bersch-config-server
+          default-label: main
+          search-paths:
+            - 'greeting-service*'
