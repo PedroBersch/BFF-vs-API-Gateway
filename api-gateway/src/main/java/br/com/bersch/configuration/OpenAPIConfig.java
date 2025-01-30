@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Lazy;
 
 import java.util.ArrayList;
 import java.util.List;
-@OpenAPIDefinition
+@OpenAPIDefinition()
 @Configuration
 public class OpenAPIConfig {
 
@@ -23,6 +23,7 @@ public class OpenAPIConfig {
         return new OpenAPI().info(new Info()
                 .title("API Gateway Service")
                 .description("API Gateway Service")
-                .version("1.0.0"));
+                .version("1.0.0"))
+                ;
     }
 }

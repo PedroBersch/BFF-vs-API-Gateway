@@ -17,11 +17,18 @@ spring:
       ddl-auto: update
     show-sql: true
   flyway:
-    url: jdbc:mysql://localhost:3306/
-    schemas: book_service
+    url: jdbc:mysql://localhost:3306/book_service?useTimezone=true&serverTimezone=UTC
     user: root
     password: admin123
     enabled: false
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
 eureka:
   client:
     service-url:
@@ -38,3 +45,7 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
   show-actuator: true
+management:
+  tracing:
+    sampling:
+      probability: 1.0

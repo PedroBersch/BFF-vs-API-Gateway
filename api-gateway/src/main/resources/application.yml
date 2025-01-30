@@ -1,12 +1,14 @@
 server:
   port: 8765
-
+  forward-headers-strategy: native
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
+  instance:
+    app name: "api-gateway"
 
 spring:
   cloud:
@@ -28,7 +30,7 @@ spring:
           predicates:
             - Path=/v3/api-docs/**
           filters:
-            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
+            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs, /v3/api-docs/$\{path}
 
 springdoc:
   swagger-ui:
@@ -36,7 +38,11 @@ springdoc:
       - name: gateway-service
         url: /v3/api-docs
       - name: cambio-service
-        url: cambio-service/v3/api-docs
+        url: /cambio-service/v3/api-docs
       - name: book-service
         url: /book-service/v3/api-docs
     enabled: true
+management:
+  tracing:
+    sampling:
+      probability: 1.0

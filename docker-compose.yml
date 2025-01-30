@@ -1,0 +1,91 @@
+services:
+  naming-server:
+    image: pedrobersch/naming-server:0.0.1-SNAPSHOT
+    ports:
+      - "8761:8761"
+    networks:
+      - bersch-network
+  api-gateway:
+    image: pedrobersch/api-gateway:0.0.1-SNAPSHOT
+    ports:
+      - "8765:8765"
+    networks:
+      - bersch-network
+    depends_on:
+      - naming-server
+    environment:
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka/
+  cambio-service:
+    image: pedrobersch/cambio-service
+    build:
+      context: .
+      dockerfile: cambio-service/Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - naming-server
+      - cambio-db
+    restart: always
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka/
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+      SPRING.APPLICATION.NAME: cambio-service
+      SPRING.DATASOURCE.URL: jdbc:mysql://cambio-db:3308/cambio_service?useSSL=false&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2
+      SPRING.DATASOURCE.USERNAME: root
+      SPRING.DATASOURCE.PASSWORD: admin123
+      SPRING.FLYWAY.URL: jdbc:mysql://cambio-db:3308/cambio_service?useSSL=false&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2
+      SPRING.FLYWAY.USER: root
+      SPRING.FLYWAY.PASSWORD: admin123
+      SPRING.JPA.HIBERNATE.DIALECT: org.hibernate.dialect.MySQL8Dialect
+    networks:
+      - bersch-network
+  cambio-db:
+    image: mysql:8.0.40
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      TZ: America/Sao_Paulo
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: admin123
+      MYSQL_DATABASE: cambio_service
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_TCP_PORT: 3308
+    ports:
+      - "3308:3308"
+    expose:
+      - "3308"
+    volumes:
+      - cambio-db-data:/var/lib/mysql
+    networks:
+      - bersch-network
+  book-db:
+    image: mysql:8.0.40
+    command: [ "--default-authentication-plugin=mysql_native_password", "--sql_mode=" ]
+    restart: always
+    environment:
+      TZ: America/Sao_Paulo
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: admin123
+      MYSQL_DATABASE: book_service
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_TCP_PORT: 3310
+    ports:
+      - "3310:3310"
+    expose:
+      - "3310"
+    networks:
+      - bersch-network
+  zipkin-server:
+    image: openzipkin/zipkin:2.23.2
+    ports:
+      - "9411:9411"
+    networks:
+      - bersch-network
+networks:
+  bersch-network:
+    driver: bridge
+volumes:
+  cambio-db-data:
