@@ -30,7 +30,11 @@ spring:
           predicates:
             - Path=/v3/api-docs/**
           filters:
-            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs, /v3/api-docs/$\{path}
+            - RewritePath=/v3/api-docs/(?<segment>.*), /$\{segment}/v3/api-docs
+        - id: swagger-ui
+          uri: http://localhost:8765
+          predicates:
+            - Path=/swagger-ui.html,/swagger-ui/**
 
 springdoc:
   swagger-ui:
@@ -42,6 +46,10 @@ springdoc:
       - name: book-service
         url: /book-service/v3/api-docs
     enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    disable-swagger-default-url: true
+    use-root-path: true
 management:
   tracing:
     sampling:

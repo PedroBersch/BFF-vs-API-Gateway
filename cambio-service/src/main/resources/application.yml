@@ -26,7 +26,7 @@ eureka:
       defaultZone: http://localhost:8761/eureka
 springdoc:
   api-docs:
-    path: /cambio-service/v3/api-docs
+    path: /v3/api-docs    # Remove the /cambio-service/ prefix
   swagger-ui:
     path: /swagger-ui.html
   show-actuator: true
